@@ -23,9 +23,9 @@ class MedMNIST(Sequence):
         as_rgb=False,
         root=DEFAULT_ROOT,
         size=None,
-        mmap_mode=None,
+        mmap_mode=None
     ):
-        """
+        ''' 
         Args:
 
             split (str, required): 'train', 'val' or 'test'
@@ -34,7 +34,7 @@ class MedMNIST(Sequence):
             size (int, optional): The size of the returned images. If None, use MNIST-like 28. Default: None.
             mmap_mode (str, optional): If not None, read image arrays from the disk directly. This is useful to set `mmap_mode='r'` to save memory usage when the dataset is large (e.g., PathMNIST-224). Default: None.
 
-        """
+        '''
 
         if (size is None) or (size == 28):
             self.size = 28
@@ -44,23 +44,22 @@ class MedMNIST(Sequence):
             self.size = size
             self.size_flag = f"_{size}"
 
+
         self.info = INFO[self.flag]
 
         if root is not None and os.path.exists(root):
             self.root = root
         else:
-            raise RuntimeError(
-                "Failed to setup the default `root` directory. "
-                + "Please specify and create the `root` directory manually."
-            )
+            raise RuntimeError("Failed to setup the default `root` directory. " +
+                               "Please specify and create the `root` directory manually.")
 
         if download:
             self.download()
 
-        if not os.path.exists(os.path.join(self.root, "{}.npz".format(self.flag))):
-            raise RuntimeError(
-                "Dataset not found." + " You can use download=True to download it"
-            )
+        if not os.path.exists(
+                os.path.join(self.root, "{}.npz".format(self.flag))):
+            raise RuntimeError('Dataset not found.' +
+                               ' You can use download=True to download it')
 
         npz_file = np.load(
             os.path.join(self.root, f"{self.flag}{self.size_flag}.npz"),
@@ -82,7 +81,7 @@ class MedMNIST(Sequence):
         return self.imgs.shape[0]
 
     def __repr__(self):
-        """Adapted from torchvision.ss"""
+        '''Adapted from torchvision.ss'''
         _repr_indent = 4
         head = f"Dataset {self.__class__.__name__} ({self.flag})"
         body = [f"Number of datapoints: {self.__len__()}"]
@@ -96,7 +95,7 @@ class MedMNIST(Sequence):
         body.append(f"License: {self.info['license']}")
 
         lines = [head] + [" " * _repr_indent + line for line in body]
-        return "\n".join(lines)
+        return '\n'.join(lines)
 
     def download(self):
         try:
@@ -109,11 +108,9 @@ class MedMNIST(Sequence):
                 md5=self.info[f"MD5{self.size_flag}"],
             )
         except:
-            raise RuntimeError(
-                "Something went wrong when downloading! "
-                + "Go to the homepage to download manually. "
-                + HOMEPAGE
-            )
+            raise RuntimeError('Something went wrong when downloading! ' +
+                               'Go to the homepage to download manually. ' +
+                               HOMEPAGE)
 
     @staticmethod
     def _collate_fn(data):
@@ -129,16 +126,16 @@ class MedMNIST2D(MedMNIST):
     available_sizes = [28, 64, 128, 224]
 
     def __getitem__(self, index):
-        """
+        '''
         return: (without transform/target_transofrm)
             img: PIL.Image
             target: np.array of `L` (L=1 for single-label)
-        """
+        '''
         img, target = self.imgs[index], self.labels[index].astype(int)
         img = Image.fromarray(img)
 
         if self.as_rgb:
-            img = img.convert("RGB")
+            img = img.convert('RGB')
 
         if self.transform is not None:
             img = self.transform(img)
@@ -158,11 +155,7 @@ class MedMNIST2D(MedMNIST):
             img_folder=os.path.join(folder, f"{self.flag}{self.size_flag}"),
             split=self.split,
             postfix=postfix,
-            csv_path=(
-                os.path.join(folder, f"{self.flag}{self.size_flag}.csv")
-                if write_csv
-                else None
-            ),
+            csv_path=os.path.join(folder, f"{self.flag}{self.size_flag}.csv") if write_csv else None
         )
 
     def montage(self, length=20, replace=False, save_folder=None):
@@ -171,18 +164,15 @@ class MedMNIST2D(MedMNIST):
         n_sel = length * length
         sel = np.random.choice(self.__len__(), size=n_sel, replace=replace)
 
-        montage_img = montage2d(
-            imgs=self.imgs, n_channels=self.info["n_channels"], sel=sel
-        )
+        montage_img = montage2d(imgs=self.imgs,
+                                n_channels=self.info['n_channels'],
+                                sel=sel)
 
         if save_folder is not None:
             if not os.path.exists(save_folder):
                 os.makedirs(save_folder)
-            montage_img.save(
-                os.path.join(
-                    save_folder, f"{self.flag}{self.size_flag}_{self.split}_montage.jpg"
-                )
-            )
+            montage_img.save(os.path.join(save_folder,
+                                          f"{self.flag}{self.size_flag}_{self.split}_montage.jpg"))
 
         return montage_img
 
@@ -191,14 +181,14 @@ class MedMNIST3D(MedMNIST):
     available_sizes = [28, 64]
 
     def __getitem__(self, index):
-        """
+        '''
         return: (without transform/target_transofrm)
             img: an array of 1x28x28x28 or 3x28x28x28 (if `as_RGB=True`), in [0,1]
             target: np.array of `L` (L=1 for single-label)
-        """
+        '''
         img, target = self.imgs[index], self.labels[index].astype(int)
 
-        img = np.stack([img / 255.0] * (3 if self.as_rgb else 1), axis=0)
+        img = np.stack([img/255.]*(3 if self.as_rgb else 1), axis=0)
 
         if self.transform is not None:
             img = self.transform(img)
@@ -219,35 +209,28 @@ class MedMNIST3D(MedMNIST):
             img_folder=os.path.join(folder, f"{self.flag}{self.size_flag}"),
             split=self.split,
             postfix=postfix,
-            csv_path=(
-                os.path.join(folder, f"{self.flag}{self.size_flag}.csv")
-                if write_csv
-                else None
-            ),
+            csv_path=os.path.join(folder, f"{self.flag}{self.size_flag}.csv") if write_csv else None
         )
 
     def montage(self, length=20, replace=False, save_folder=None):
-        assert self.info["n_channels"] == 1
+        assert self.info['n_channels'] == 1
 
         from medmnist.utils import montage3d, save_frames_as_gif
 
         n_sel = length * length
         sel = np.random.choice(self.__len__(), size=n_sel, replace=replace)
 
-        montage_frames = montage3d(
-            imgs=self.imgs, n_channels=self.info["n_channels"], sel=sel
-        )
+        montage_frames = montage3d(imgs=self.imgs,
+                                   n_channels=self.info['n_channels'],
+                                   sel=sel)
 
         if save_folder is not None:
             if not os.path.exists(save_folder):
                 os.makedirs(save_folder)
 
-            save_frames_as_gif(
-                montage_frames,
-                os.path.join(
-                    save_folder, f"{self.flag}{self.size_flag}_{self.split}_montage.gif"
-                ),
-            )
+            save_frames_as_gif(montage_frames,
+                               os.path.join(save_folder,
+                                            f"{self.flag}{self.size_flag}_{self.split}_montage.gif"))
 
         return montage_frames
 
@@ -332,7 +315,7 @@ OrganMNISTSagittal = OrganSMNIST
 
 def get_loader(dataset, batch_size):
     total_size = len(dataset)
-    print("Size", total_size)
+    print('Size', total_size)
     index_generator = shuffle_iterator(range(total_size))
     while True:
         data = []
