@@ -16,3 +16,9 @@ Script for training and evaluating with Autokeras was adapted from code used in 
 3. Run the Autokeras script
 
     ```python3 train_and_eval_autokeras.py --input_root medmnist```
+
+# Resources
+- https://www.nature.com/articles/s41597-022-01721-8
+- https://github.com/MedMNIST
+- https://autokeras.com/
+- https://www.tensorflow.org/install/pip
