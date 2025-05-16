@@ -11,7 +11,7 @@ from medmnist.info import DEFAULT_ROOT
 from tensorflow.keras.models import load_model
 
 
-def main(data_flag, num_trials, input_root, output_root, gpu_ids, run, model_path):
+def main(data_flag, num_trials, input_root, output_root, gpu_ids, run, model_path, model_architecture):
 
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_ids)
@@ -45,7 +45,7 @@ def main(data_flag, num_trials, input_root, output_root, gpu_ids, run, model_pat
         return
 
     model = train(
-        data_flag, x_train, y_train, x_val, y_val, task, num_trials, output_root, run
+        data_flag, x_train, y_train, x_val, y_val, task, num_trials, output_root, run, model_architecture
     )
 
     test(model, data_flag, x_train, "train", output_root, run)
@@ -54,18 +54,37 @@ def main(data_flag, num_trials, input_root, output_root, gpu_ids, run, model_pat
 
 
 def train(
-    data_flag, x_train, y_train, x_val, y_val, task, num_trials, output_root, run
+    data_flag, x_train, y_train, x_val, y_val, task, num_trials, output_root, run, model_architecture
 ):
+    clf = None
 
-    clf = ak.ImageClassifier(
-        multi_label=task == "multi-label, binary-class",
-        project_name=data_flag,
-        distribution_strategy=tf.distribute.MirroredStrategy(),
-        metrics=["AUC", "accuracy"],
-        objective=keras_tuner.Objective("val_AUC", direction="max"),
-        overwrite=True,
-        max_trials=num_trials,
-    )
+    if model_architecture:
+        # Use custom model architecture
+        input_node = ak.ImageInput(np.ndarray([]))
+        output_node = ak.Normalization()(input_node)
+        output_node1 = ak.ConvBlock()(output_node)
+        output_node2 = ak.ResNetBlock(version="v2")(output_node)
+        output_node = ak.Merge()([output_node1, output_node2])
+        output_node = ak.ClassificationHead()(output_node)
+        clf = ak.AutoModel(
+            inputs=input_node,
+            outputs=output_node,
+            overwrite=True, 
+            metrics=["AUC", "accuracy"], 
+            objective=keras_tuner.Objective("val_AUC", direction="max"),
+            max_trials=num_trials, 
+        )
+    else:
+        # Use default model architecture
+        clf = ak.ImageClassifier(
+            multi_label=task == "multi-label, binary-class",
+            project_name=data_flag,
+            distribution_strategy=tf.distribute.MirroredStrategy(),
+            metrics=["AUC", "accuracy"],
+            objective=keras_tuner.Objective("val_AUC", direction="max"),
+            overwrite=True,
+            max_trials=num_trials,
+        )
 
     clf.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=20)
 
@@ -100,6 +119,7 @@ if __name__ == "__main__":
     parser.add_argument("--data_flag", default="breastmnist", type=str)
     parser.add_argument("--input_root", default=DEFAULT_ROOT, help="root of the directory where *.npz file is read from",type=str)
     parser.add_argument("--output_root", default="./autokeras", type=str)
+    parser.add_argument("--model_architecture", default=None, type=str)
     parser.add_argument("--gpu_ids", default="0", type=str)
     parser.add_argument(
         "--run",
@@ -128,5 +148,6 @@ if __name__ == "__main__":
     run = args.run
     model_path = args.model_path
     num_trials = args.num_trials
+    model_architecture = args.model_architecture
 
-    main(data_flag, num_trials, input_root, output_root, gpu_ids, run, model_path)
+    main(data_flag, num_trials, input_root, output_root, gpu_ids, run, model_path, model_architecture)
