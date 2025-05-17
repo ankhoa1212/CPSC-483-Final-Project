@@ -26,7 +26,7 @@ For a proof-of-concept, a convolutional neural network was developed. This parti
 
 ## Autokeras
 The CNN showed promising results, so an automated machine learning library was used to find an ideal architecture for that can perform well on the data.
-Script for training and evaluating with Autokeras was adapted from [this code](https://github.com/MedMNIST/experiments/blob/main/MedMNIST2D/train_and_eval_autokeras.py)
+Script for training and evaluating with Autokeras was adapted from [this code](https://github.com/MedMNIST/experiments/blob/main/MedMNIST2D/train_and_eval_autokeras.py).
 
 1. Install Python 3.11 ([pyenv](https://github.com/pyenv/pyenv) can be installed and used for multiple Python versions)
 2. Create a [Python Virtual Environment](https://docs.python.org/3/library/venv.html) (recommended)
@@ -61,7 +61,7 @@ The architecture of the best model is as follows:
 
 ![breastmnist_autokeras_model3_arch_visualization](https://github.com/user-attachments/assets/949f15f4-cf9e-465c-8c6d-ad0fb0e97101)
 
-Model architectures were visualized using [this script](https://github.com/ankhoa1212/CPSC-483-Final-Project/blob/main/visualization.py).
+Model architectures were visualized using [this script](https://github.com/ankhoa1212/CPSC-483-Final-Project/blob/main/visualize_model.py).
 
 ## Conclusion
 We developed a machine learning model with an AUC of 0.956 and an accuracy of 0.936, which exceeded the results of the original BreastMNIST 2D benchmark [here](https://medmnist.com/).
