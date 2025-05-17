@@ -64,7 +64,7 @@ The architecture of the best model is as follows:
 Model architectures were visualized using [this script](https://github.com/ankhoa1212/CPSC-483-Final-Project/blob/main/visualize_model.py).
 
 ## Conclusion
-We developed a machine learning model with an AUC of 0.956 and an accuracy of 0.936, which exceeded the results of the original BreastMNIST 2D benchmark [here](https://medmnist.com/).
+We developed a machine learning model with an AUC of 0.956 and an accuracy of 0.936, which exceeded the original BreastMNIST 2D [benchmark results](https://medmnist.com/) (AUC: 0.871, accuracy: 0.831).
 
 ### Takeaways
 For image classification problems, having convolutional layers can be effective at extracting features from images. Managing multiple libraries and dependencies in Python can be complicated, so installing them in an isolated environment can help with avoiding conflicts between dependencies. As a result, Google Colab can be useful to quickly get started on a machine learning project, but has the downside of usage limitations, especially on problems that require a lot of computation. To set up and use certain code libraries, it is extremely useful to read existing documentation.
